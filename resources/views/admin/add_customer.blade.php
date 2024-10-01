@@ -671,7 +671,7 @@
                                             <!--begin::Input group-->
                                             <div class="fv-row mb-7">
                                                 <!--begin::Label-->
-                                                <label class=" form-label">State</label>
+                                                <label class=" form-label">Province</label>
                                                 <!--end::Label-->
 
                                                 <!--begin::Input-->
@@ -697,7 +697,7 @@
                                             <!--begin::Input group-->
                                             <div class="fv-row mb-7">
                                                 <!--begin::Label-->
-                                                <label class=" form-label">Zip Code</label>
+                                                <label class=" form-label">Postal Code</label>
                                                 <!--end::Label-->
 
                                                 <!--begin::Input-->
@@ -726,7 +726,7 @@
 
                                                 <!--begin::Input-->
                                                 <input type="text" name="country" class="form-control mb-2"
-                                                    placeholder="Country..." value="{{ old('country') }}">
+                                                    placeholder="Country..." value="{{ old('country') ?? 'Canada' }}">
                                                 <!--end::Input-->
 
 
