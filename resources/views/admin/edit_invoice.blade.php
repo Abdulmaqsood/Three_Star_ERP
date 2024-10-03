@@ -113,27 +113,48 @@
 
                             <!--begin::Card body-->
                             <div class="card-body pt-0">
-                                <!--begin::Input group-->
-                                <div class="mb-10 fv-row fv-plugins-icon-container">
-                                    <!--begin::Label-->
-                                    <label class="required form-label">Invoice Number</label>
-                                    <!--end::Label-->
+                               
+                                <div class="row">
+                                    <!--begin::Input group-->
+                                    <div class="col-lg-6 col-md-6 mb-10 fv-row fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required form-label">Invoice Number</label>
+                                        <!--end::Label-->
 
-                                    <!--begin::Input-->
-                                    <input type="text" name="invoice_number" class="form-control mb-2"
-                                        placeholder="Invoice Number"
-                                        value="{{ old('invoice_number', $invoice->DocNumber) }}">
-                                    <!--end::Input-->
+                                        <!--begin::Input-->
+                                        <input type="text" name="invoice_number" class="form-control mb-2"
+                                            placeholder="Invoice Number"
+                                            value="{{ old('invoice_number', $invoice->DocNumber) }}">
+                                        <!--end::Input-->
 
-                                    @error('invoice_number')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                    <div
-                                        class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                        @error('invoice_number')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                        <div
+                                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                        </div>
                                     </div>
-                                </div>
-                                <!--end::Input group-->
+                                    <!--end::Input group-->
+                                    <!--begin::Input group-->
+                                    <div class="col-lg-6 col-md-6 mb-10 fv-row fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class=" form-label">PO #</label>
+                                        <!--end::Label-->
 
+                                        <!--begin::Input-->
+                                        <input type="text" name="po_number" class="form-control mb-2"
+                                            placeholder="Invoice PO #" value="{{ old('po_number' , $invoice->PONumber) }}">
+                                        <!--end::Input-->
+
+                                        @error('po_number')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                        <div
+                                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                        </div>
+                                    </div>
+                                    <!--end::Input group-->
+                                </div>
 
                                 <!--begin::Input group-->
                                 <div class="mb-10 fv-row fv-plugins-icon-container">
@@ -391,7 +412,8 @@
                                             </div>
                                             <!--end::Col-->
                                             <div class="col-auto " style="margin-top : 25px;">
-                                                <button type="button" class="btn btn-danger remove-product" onclick="removeProduct(this)">X</button>
+                                                <button type="button" class="btn btn-danger remove-product"
+                                                    onclick="removeProduct(this)">X</button>
                                             </div>
                                         </div>
                                     @endforeach
@@ -669,7 +691,7 @@
                         method: 'GET',
                         data: {
                             customer_id: customerId,
-                            selected_products: selectedProductIds 
+                            selected_products: selectedProductIds
 
                         },
                         success: function(response) {
@@ -696,8 +718,8 @@
 
             };
             window.removeProduct = function(button) {
-    $(button).closest('.product').remove();
-}
+                $(button).closest('.product').remove();
+            }
         });
     </script>
 @endpush

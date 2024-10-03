@@ -676,7 +676,7 @@
 
                                                 <!--begin::Input-->
                                                 <input type="text" name="state" class="form-control mb-2"
-                                                    placeholder="State..." value="{{ old('state') }}">
+                                                    placeholder="Province..." value="{{ old('state') }}">
                                                 <!--end::Input-->
 
 
@@ -702,7 +702,7 @@
 
                                                 <!--begin::Input-->
                                                 <input type="text" name="zipCode" class="form-control mb-2"
-                                                    placeholder="Zip Code..." value="{{ old('zipCode') }}">
+                                                    placeholder="Postal Code..." value="{{ old('zipCode') }}">
                                                 <!--end::Input-->
 
                                                 @error('zipCode')
@@ -852,12 +852,12 @@
                                             <!--begin::Input group-->
                                             <div class="fv-row mb-7">
                                                 <!--begin::Label-->
-                                                <label class=" form-label">State</label>
+                                                <label class=" form-label">Province</label>
                                                 <!--end::Label-->
 
                                                 <!--begin::Input-->
                                                 <input type="text" name="shippingState" class="form-control mb-2"
-                                                    placeholder="State..." value="{{ old('shippingState') }}">
+                                                    placeholder="Province..." value="{{ old('shippingState') }}">
                                                 <!--end::Input-->
 
 
@@ -878,12 +878,12 @@
                                             <!--begin::Input group-->
                                             <div class="fv-row mb-7">
                                                 <!--begin::Label-->
-                                                <label class=" form-label">Zip Code</label>
+                                                <label class=" form-label">Postal Code</label>
                                                 <!--end::Label-->
 
                                                 <!--begin::Input-->
                                                 <input type="text" name="shippingZipCode" class="form-control mb-2"
-                                                    placeholder="Zip Code..." value="{{ old('shippingZipCode') }}">
+                                                    placeholder="Postal Code..." value="{{ old('shippingZipCode') }}">
                                                 <!--end::Input-->
 
                                                 @error('shippingZipCode')
@@ -907,7 +907,7 @@
 
                                                 <!--begin::Input-->
                                                 <input type="text" name="shippingCountry" class="form-control mb-2"
-                                                    placeholder="Country..." value="{{ old('shippingCountry') }}">
+                                                    placeholder="Country..." value="{{ old('shippingCountry') ?? 'Canada' }}">
                                                 <!--end::Input-->
 
 

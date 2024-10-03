@@ -428,7 +428,6 @@ class QuickBookService
 
 
         if (count($errors) > 0) {
-            @dd($errors);
             Session::flash('error', 'Some invoices could not be added to QuickBooks. Check the logs for more details.');
         } else {
             Session::flash('success', 'All invoices were successfully added to QuickBooks.');
@@ -453,76 +452,79 @@ class QuickBookService
     public function allProducts()
     {
         $products = $this->dataService->Query("SELECT * FROM Item WHERE Type = 'NONINVENTORY'");
+        if (empty($products)) {
+            $products = $this->dataService->Query("SELECT * FROM Item ");
+        }
         return $products;
     }
-  public function createProduct($data)
-{
-    
-    try {
-        // Step 1: Query Income Account (e.g., Sales of Product Income)
-        $incomeAccountQuery = $this->dataService->Query("SELECT * FROM Account WHERE AccountType = 'Income' AND Name = 'Sales of Product Income'");
-        $incomeAccount = current($incomeAccountQuery);
+    public function createProduct($data)
+    {
+
+        try {
+            // Step 1: Query Income Account (e.g., Sales of Product Income)
+            $incomeAccountQuery = $this->dataService->Query("SELECT * FROM Account WHERE AccountType = 'Income' AND Name = 'Sales of Product Income'");
+            $incomeAccount = current($incomeAccountQuery);
             $taxCodes = $this->dataService->Query("SELECT * FROM TaxCode");
 
-          foreach ($taxCodes as $taxCode) {
-        if ($taxCode->Name === 'HST ON') {
-            $taxRef = $taxCode->Id;
-        }
-    }
-        // // Step 2: Query Expense Account (e.g., Cost of Goods Sold)
-        // $expenseAccountQuery = $this->dataService->Query("SELECT * FROM Account WHERE AccountType = 'Expense' AND Name = 'Cost of Goods Sold'");
-        // $expenseAccount = current($expenseAccountQuery);
-
-        // // Step 3: Ensure the accounts were found and have valid IDs
-        // if (!$incomeAccount || !$expenseAccount) {
-        //     return ['error' => 'Unable to find the necessary accounts in QuickBooks.'];
-        // }
-
-        // Prepare QuickBooks product data with dynamic account references
-        $quickBooksProduct = [
-            "Name" => $data['name'],
-            "UnitPrice" => $data['price'],
-            "PurchaseCost" => $data['cost'],
-            "Sku" => $data['sku'],
-            "FullyQualifiedName" => $data['name'],
-            "Type" => "NonInventory", // Ensure the Type is properly capitalized
-            "Active" => true,
-            "Description" => $data['pack'],
-            "IncomeAccountRef" => [
-                "name" => $incomeAccount->Name,
-                "value" => $incomeAccount->Id,
-            ],
-            "SalesTaxCodeRef" => [
-                "value" => $taxRef,
-            ],
-            // "ExpenseAccountRef" => [
-            //     "name" => $expenseAccount->Name,
-            //     "value" => $expenseAccount->Id,
-            // ],
-            "InvStartDate" => now(), // Format date as a string
-        ];
-
-        $qboProductObject = QBOProduct::create($quickBooksProduct);
-        // Add the product to QuickBooks
-        $quickBooksResult = $this->dataService->Add($qboProductObject);
-
-        if (!$quickBooksResult) {
-            // Capture the last error
-            $error = $this->dataService->getLastError();
-            if ($error) {
-                Log::error('QuickBooks Error: ' . $error->getResponseBody());
-                return ['error' => 'Failed to create product in QuickBooks: ' . $error->getResponseBody()];
+            foreach ($taxCodes as $taxCode) {
+                if ($taxCode->Name === 'HST ON') {
+                    $taxRef = $taxCode->Id;
+                }
             }
+            // // Step 2: Query Expense Account (e.g., Cost of Goods Sold)
+            // $expenseAccountQuery = $this->dataService->Query("SELECT * FROM Account WHERE AccountType = 'Expense' AND Name = 'Cost of Goods Sold'");
+            // $expenseAccount = current($expenseAccountQuery);
+
+            // // Step 3: Ensure the accounts were found and have valid IDs
+            // if (!$incomeAccount || !$expenseAccount) {
+            //     return ['error' => 'Unable to find the necessary accounts in QuickBooks.'];
+            // }
+
+            // Prepare QuickBooks product data with dynamic account references
+            $quickBooksProduct = [
+                "Name" => $data['name'],
+                "UnitPrice" => $data['price'],
+                "PurchaseCost" => $data['cost'],
+                "Sku" => $data['sku'],
+                "FullyQualifiedName" => $data['name'],
+                "Type" => "NonInventory", // Ensure the Type is properly capitalized
+                "Active" => true,
+                "Description" => $data['pack'],
+                "IncomeAccountRef" => [
+                    "name" => $incomeAccount->Name,
+                    "value" => $incomeAccount->Id,
+                ],
+                "SalesTaxCodeRef" => [
+                    "value" => $taxRef,
+                ],
+                // "ExpenseAccountRef" => [
+                //     "name" => $expenseAccount->Name,
+                //     "value" => $expenseAccount->Id,
+                // ],
+                "InvStartDate" => now(), // Format date as a string
+            ];
+
+            $qboProductObject = QBOProduct::create($quickBooksProduct);
+            // Add the product to QuickBooks
+            $quickBooksResult = $this->dataService->Add($qboProductObject);
+
+            if (!$quickBooksResult) {
+                // Capture the last error
+                $error = $this->dataService->getLastError();
+                if ($error) {
+                    Log::error('QuickBooks Error: ' . $error->getResponseBody());
+                    return ['error' => 'Failed to create product in QuickBooks: ' . $error->getResponseBody()];
+                }
+                return ['error' => 'Failed to create product in QuickBooks.'];
+            }
+
+            return ['success' => true, 'Id' => $quickBooksResult->Id];
+        } catch (\Exception $e) {
+            // Log the error (optional)
+            Log::error('QuickBooks product creation error: ' . $e->getMessage());
             return ['error' => 'Failed to create product in QuickBooks.'];
         }
-
-        return ['success' => true, 'Id' => $quickBooksResult->Id];
-    } catch (\Exception $e) {
-        // Log the error (optional)
-        Log::error('QuickBooks product creation error: ' . $e->getMessage());
-        return ['error' => 'Failed to create product in QuickBooks.'];
     }
-}
 
 
 
@@ -592,6 +594,7 @@ class QuickBookService
                 "Line1" => $data['address_1'] ?? '',
                 "Line2" => $data['address_2'] ?? '',
                 "City" => $data['city'] ?? '',
+                "CountrySubDivisionCode" => $data['state'] ?? '',
                 "Country" => $data['country'] ?? '',
                 "PostalCode" => $data['zipCode'] ?? '',
             ],
@@ -599,6 +602,7 @@ class QuickBookService
                 "Line1" => $data['shippingAddress_1'] ?? ($data['address_1'] ?? ''),
                 "Line2" => $data['shippingAddress_2'] ?? ($data['address_2'] ?? ''),
                 "City" => $data['shippingCity'] ?? ($data['city'] ?? ''),
+                "CountrySubDivisionCode" => $data['shippingState'] ?? ($data['state'] ?? ''),
                 "Country" => $data['shippingCountry'] ?? ($data['country'] ?? ''),
                 "PostalCode" => $data['shippingZipCode'] ?? ($data['zipCode'] ?? ''),
             ],
@@ -648,7 +652,6 @@ class QuickBookService
             }
 
             $qboCustomerObject = QBOCustomer::create($quickBooksCustomer);
-                            // @dd($qboCustomerObject);
 
             $result = $this->dataService->Add($qboCustomerObject);
 
@@ -722,6 +725,7 @@ class QuickBookService
                     "Line1" => $data['address_1'] ?? ($existingCustomer->BillAddr->Line1 ?? ''),
                     "Line2" => $data['address_2'] ?? ($existingCustomer->BillAddr->Line2 ?? ''),
                     "City" => $data['city'] ?? ($existingCustomer->BillAddr->City ?? ''),
+                    "CountrySubDivisionCode" => $data['state'] ?? ($existingCustomer->BillAddr->CountrySubDivisionCode ?? ''),
                     "Country" => $data['country'] ?? ($existingCustomer->BillAddr->Country ?? ''),
                     "PostalCode" => $data['zipCode'] ?? ($existingCustomer->BillAddr->PostalCode ?? ''),
                 ],
@@ -729,6 +733,7 @@ class QuickBookService
                     "Line1" => $data['shippingAddress_1'] ?? ($data['address_1'] ?? ($existingCustomer->ShipAddr->Line1 ?? '')),
                     "Line2" => $data['shippingAddress_2'] ?? ($data['address_2'] ?? ($existingCustomer->ShipAddr->Line2 ?? '')),
                     "City" => $data['shippingCity'] ?? ($data['city'] ?? ($existingCustomer->ShipAddr->City ?? '')),
+                    "CountrySubDivisionCode" => $data['shippingState'] ?? ($existingCustomer->ShipAddr->CountrySubDivisionCode ?? ''),
                     "Country" => $data['shippingCountry'] ?? ($data['country'] ?? ($existingCustomer->ShipAddr->Country ?? '')),
                     "PostalCode" => $data['shippingZipCode'] ?? ($data['zipCode'] ?? ($existingCustomer->ShipAddr->PostalCode ?? '')),
                 ],
@@ -792,15 +797,15 @@ class QuickBookService
     public function updateProduct($productId, array $data)
     {
         try {
-                    $incomeAccountQuery = $this->dataService->Query("SELECT * FROM Account WHERE AccountType = 'Income' AND Name = 'Sales of Product Income'");
-        $incomeAccount = current($incomeAccountQuery);
-                    $taxCodes = $this->dataService->Query("SELECT * FROM TaxCode");
+            $incomeAccountQuery = $this->dataService->Query("SELECT * FROM Account WHERE AccountType = 'Income' AND Name = 'Sales of Product Income'");
+            $incomeAccount = current($incomeAccountQuery);
+            $taxCodes = $this->dataService->Query("SELECT * FROM TaxCode");
 
-          foreach ($taxCodes as $taxCode) {
-        if ($taxCode->Name === 'HST ON') {
-            $taxRef = $taxCode->Id;
-        }
-    }
+            foreach ($taxCodes as $taxCode) {
+                if ($taxCode->Name === 'HST ON') {
+                    $taxRef = $taxCode->Id;
+                }
+            }
             if (!$this->dataService) {
                 return ['error' => 'DataService is not initialized.'];
             }
@@ -1026,11 +1031,11 @@ class QuickBookService
         try {
             $taxCodes = $this->dataService->Query("SELECT * FROM TaxCode");
 
-          foreach ($taxCodes as $taxCode) {
-        if ($taxCode->Name === 'HST ON') {
-            $taxRef = $taxCode->Id;
-        }
-    }
+            foreach ($taxCodes as $taxCode) {
+                if ($taxCode->Name === 'HST ON') {
+                    $taxRef = $taxCode->Id;
+                }
+            }
 
             // Fetch the customer from QuickBooks
             $customer = $this->dataService->FindById('Customer', $data['customer_id']);
@@ -1055,7 +1060,9 @@ class QuickBookService
                     "Country" => $data['shipping_country'] ?? '',
                 ],
                 "DocNumber" => $data['invoice_number'],
-                "DueDate" => now()->addDays(30), // Set due date 30 days from now
+                "PONumber" => $data['po_number'] ?? null,
+                "TxnDate" => now()->addDays(30), 
+                "DueDate" => now()->addDays(30), 
                 "PrivateNote" => $data['invoice_description'] ?? '',
                 "TotalAmt" => $data['invoice_grand_total'],
                 "ApplyTaxAfterDiscount" => false,
@@ -1105,22 +1112,21 @@ class QuickBookService
                             "value" => $taxRef // Replace with the actual tax code
                         ]
                     ],
-                    "Description" => $item['description'] ?? ''
+                    "Description" => $item['description'] ?? 'default description'
                 ];
             }
 
             $existingInvoice = $this->dataService->Query("SELECT * FROM Invoice WHERE Id = '{$data['invoice_id']}'");
-
             if (empty($existingInvoice)) {
                 // Add the invoice to QuickBooks
                 $qboInvoiceObject = QBOInvoice::create($quickBooksInvoice);
+
                 $result = $this->dataService->Add($qboInvoiceObject);
             } else {
                 $existingInvoice = reset($existingInvoice);
                 $quickBooksInvoice['Id'] = $existingInvoice->Id;
                 $quickBooksInvoice['SyncToken'] = $existingInvoice->SyncToken;
                 $qboInvoiceObject = QBOInvoice::create($quickBooksInvoice);
-
                 $result = $this->dataService->Update($qboInvoiceObject);
             }
 
@@ -1130,7 +1136,6 @@ class QuickBookService
                 $error = $this->dataService->getLastError();
                 return ['error' => "Failed to create/update invoice in QuickBooks  {$error->getResponseBody()}"];
             }
-
         } catch (\Exception $e) {
             Log::error("Error in createInvoiceInQuickBooks: " . $e->getMessage());
             return ['error' => "Failed to create/update invoice in QuickBooks" . $e->getMessage()];

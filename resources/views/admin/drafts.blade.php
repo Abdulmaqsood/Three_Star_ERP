@@ -251,7 +251,7 @@
                                                         <div class="d-flex align-items-center">
 
                                                             <div class="ms-5">
-                                                                <!--begin::Title--> <a href="#"
+                                                                <!--begin::Title--> <a href="{{ route('edit.draft.invoice', $invoice->id) }}"
                                                                     class="text-gray-800 text-hover-primary fs-5 fw-bold"
                                                                     data-kt-ecommerce-product-filter="product_name">#{{ $invoice->invoice_number }}</a>
                                                                 <!--end::Title-->

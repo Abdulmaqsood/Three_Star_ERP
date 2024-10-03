@@ -37,12 +37,14 @@ class InvoiceController extends Controller
         // @dd($data['invoices'][0]);
         return view('admin.invoices', $data);
     }
-    public function add()
+
+    public function add($customer = null)
     {
         // $data['customers'] = Customer::with('address')->get();
         // $data['products'] = Product::all();
         $data['customers'] = $this->quickBooksService->allCustomers();
         $data['products'] = $this->quickBooksService->allProducts();
+        $data['customer'] = $this->quickBooksService->editCustomer($customer);
         $data['customerProducts'] = CustomerProduct::all();
         return view('admin.add_invoice', $data);
     }

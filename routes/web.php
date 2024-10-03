@@ -179,7 +179,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Invoice Routes
     Route::get('admin/invoices', [InvoiceController::class, 'index'])->name('invoices');
-    Route::get('admin/add/invoice', [InvoiceController::class, 'add'])->name('add.invoice');
+    Route::get('admin/add/invoice/{customer?}', [InvoiceController::class, 'add'])->name('add.invoice');
     Route::get('admin/show/{invoice}/invoice', [InvoiceController::class, 'show'])->name('show.invoice');
     Route::get('admin/download/{invoice}/invoice', [InvoiceController::class, 'download'])->name('download.invoice');
     Route::get('admin/edit/{invoice}/invoice', [InvoiceController::class, 'edit'])->name('edit.invoice');

@@ -115,44 +115,46 @@
 
                             <!--begin::Card body-->
                             <div class="card-body pt-0">
-                                <!--begin::Input group-->
-                                <div class="mb-10 fv-row fv-plugins-icon-container">
-                                    <!--begin::Label-->
-                                    <label class="required form-label">Invoice Number</label>
-                                    <!--end::Label-->
+                                <div class="row">
+                                    <!--begin::Input group-->
+                                    <div class="col-lg-6 col-md-6 mb-10 fv-row fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required form-label">Invoice Number</label>
+                                        <!--end::Label-->
 
-                                    <!--begin::Input-->
-                                    <input type="text" name="invoice_number" class="form-control mb-2"
-                                        placeholder="Invoice Number" value="{{ old('invoice_number') }}">
-                                    <!--end::Input-->
+                                        <!--begin::Input-->
+                                        <input type="text" name="invoice_number" class="form-control mb-2"
+                                            placeholder="Invoice Number" value="{{ old('invoice_number') }}">
+                                        <!--end::Input-->
 
-                                    @error('invoice_number')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                    <div
-                                        class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                        @error('invoice_number')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                        <div
+                                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                        </div>
                                     </div>
-                                </div>
-                                <!--end::Input group-->
-                                {{-- <!--begin::Input group-->
-                                <div class="mb-10 fv-row fv-plugins-icon-container">
-                                    <!--begin::Label-->
-                                    <label class="required form-label">Invoice Description</label>
-                                    <!--end::Label-->
+                                    <!--end::Input group-->
+                                    <!--begin::Input group-->
+                                    <div class="col-lg-6 col-md-6 mb-10 fv-row fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class=" form-label">PO #</label>
+                                        <!--end::Label-->
 
-                                    <!--begin::Input-->
-                                    <input type="text" name="invoice_description" class="form-control mb-2"
-                                        placeholder="Invoice Description" value="{{ old('invoice_description') }}">
-                                    <!--end::Input-->
+                                        <!--begin::Input-->
+                                        <input type="text" name="po_number" class="form-control mb-2"
+                                            placeholder="Invoice PO #" value="{{ old('po_number') }}">
+                                        <!--end::Input-->
 
-                                    @error('invoice_description')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                    <div
-                                        class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                        @error('po_number')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                        <div
+                                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">
+                                        </div>
                                     </div>
+                                    <!--end::Input group-->
                                 </div>
-                                <!--end::Input group--> --}}
                                 <!--begin::Input group-->
                                 <div class="mb-10 fv-row fv-plugins-icon-container">
                                     <!--begin::Label-->
@@ -161,7 +163,8 @@
 
                                     <!--begin::Input-->
                                     <input type="text" name="shipping_address" class="form-control mb-2"
-                                        placeholder="Shipping Address" value="{{ old('shipping_address') }}">
+                                        placeholder="Shipping Address"
+                                        value="{{ old('shipping_address') ?? ($customer->ShipAddr->Line1 ?? ($customer->ShipAddr->Line2 ?? '')) }}">
                                     <!--end::Input-->
 
                                     @error('shipping_address')
@@ -181,7 +184,8 @@
 
                                         <!--begin::Input-->
                                         <input type="text" name="shipping_city" class="form-control mb-2"
-                                            placeholder="Shipping City" value="{{ old('shipping_city') }}">
+                                            placeholder="Shipping City"
+                                            value="{{ old('shipping_city' ?? ($customer->ShipAddr->City ?? '')) }}">
                                         <!--end::Input-->
 
                                         @error('shipping_city')
@@ -221,7 +225,8 @@
 
                                         <!--begin::Input-->
                                         <input type="text" name="shipping_country" class="form-control mb-2"
-                                            placeholder="Shipping Country" value="{{ old('shipping_country') }}">
+                                            placeholder="Shipping Country"
+                                            value="{{ old('shipping_country' ?? ($customer->ShipAddr->Country ?? '')) }}">
                                         <!--end::Input-->
 
                                         @error('shipping_country')
@@ -253,15 +258,16 @@
                                         class="form-select form-select-solid fw-bold">
                                         @if ($customers)
                                             <option value="">Select Customer...</option>
-                                            @foreach ($customers as $customer)
-                                                <option value="{{ $customer->Id }}"
-                                                    {{ old('customer_id') == $customer->Id ? 'selected' : '' }}>
-                                                    {{ $customer->DisplayName }} 
+                                            @foreach ($customers as $maincustomer)
+                                                <option value="{{ $maincustomer->Id }}"
+                                                    {{ old('customer_id') == $maincustomer->Id || (isset($customer) && $customer->Id == $maincustomer->Id) ? 'selected' : '' }}>
+                                                    {{ isset($customer) && $customer->Id == $maincustomer->Id ? $customer->DisplayName : $maincustomer->DisplayName }}
                                                 </option>
                                             @endforeach
                                         @else
                                             <option disabled>Customers Not available...</option>
                                         @endif
+
                                     </select>
                                     <!--end::Input-->
 
@@ -292,6 +298,7 @@
                                                 </label>
                                                 <!--end::Label-->
 
+
                                                 <!--begin::Input-->
                                                 <select name="products[0][id]" id="product"
                                                     data-placeholder="Select Product..."
@@ -308,6 +315,7 @@
                                                 </div>
                                             </div>
                                             <!--end::Input group-->
+
                                         </div>
                                         <!--end::Col-->
 
@@ -385,8 +393,9 @@
                                             <!--end::Input group-->
                                         </div>
                                         <!--end::Col-->
-                                         <div class="col-auto " style="margin-top : 25px;">
-                                            <button type="button" class="btn btn-danger remove-product" onclick="removeProduct(this)">X</button>
+                                        <div class="col-auto " style="margin-top : 25px;">
+                                            <button type="button" class="btn btn-danger remove-product"
+                                                onclick="removeProduct(this)">X</button>
                                         </div>
                                     </div>
                                 </div>
@@ -433,8 +442,9 @@
 
                         <div class="d-flex justify-content-end">
 
-        <!--begin::Button-->
-                            <button type="submit" id="kt_ecommerce_add_category_submit" class="btn btn-primary"  onclick="submitFormAsDraft()">
+                            <!--begin::Button-->
+                            <button type="submit" id="kt_ecommerce_add_category_submit" class="btn btn-primary"
+                                onclick="submitFormAsDraft()">
                                 <span class="indicator-label">
                                     Save as Draft
                                 </span>
@@ -445,7 +455,8 @@
                             <!--end::Button-->
 
                             <!--begin::Button-->
-                            <button type="submit" id="kt_ecommerce_add_category_submit" class="btn btn-primary mx-2" onclick="submitForm()">
+                            <button type="submit" id="kt_ecommerce_add_category_submit" class="btn btn-primary mx-2"
+                                onclick="submitForm()">
                                 <span class="indicator-label">
                                     Save Changes
                                 </span>
@@ -466,151 +477,155 @@
 @endsection
 @push('custom-scripts')
     <script>
-             function submitForm() {
-        document.getElementById('invoiceForm').action = "{{ route('store.invoice') }}";
-    }
-    
-    function submitFormAsDraft() {
-        document.getElementById('invoiceForm').action = "{{ route('store.draft.invoice') }}";
-    }
-      $(document).ready(function() {
-    // Function to collect selected product IDs
-    function getSelectedProductIds() {
-        let selectedProductIds = [];
-        $('.product-select').each(function() {
-            let productId = $(this).val();
-            if (productId) {
-                selectedProductIds.push(productId);
-            }
-        });
-        return selectedProductIds;
-    }
-
-    // Handle customer change and fetch products
-    $('#customer').change(function() {
-        var customerId = $(this).val();
-        if (customerId) {
-            // Get the selected product IDs
-            var selectedProductIds = getSelectedProductIds();
-            $.ajax({
-                url: '{{ route('get.products') }}',
-                method: 'GET',
-                data: {
-                    customer_id: customerId,
-                    selected_products: selectedProductIds 
-                },
-                success: function(response) {
-                    var productSelects = $('.product-select');
-                    productSelects.empty();
-                    productSelects.append('<option value="">Select Product...</option>');
-
-                    $.each(response.products, function(key, product) {
-                        productSelects.append('<option value="' + product.Id +
-                            '" data-price="' + product.price + '">' +
-                            product.Name + '</option>');
-                    });
-
-                    updatePrice(); // Ensure price update logic is in place
-                },
-                error: function() {
-                    alert('Failed to retrieve products');
-                }
-            });
-        } else {
-            $('.product-select').empty().append('<option value="">Select Product...</option>');
+        function submitForm() {
+            document.getElementById('invoiceForm').action = "{{ route('store.invoice') }}";
         }
-    });
 
-    // Update price and enable quantity input
-    function updatePrice() {
-        $('#customer, .product-select').change(function() {
-            var customerId = $('#customer').val();
-            var productDiv = $(this).closest('.product');
-            var productSelect = productDiv.find('.product-select');
-            var productId = productSelect.val();
-            var priceInput = productDiv.find('.price-input');
-            var quantityInput = productDiv.find('.quantity-input');
-
-            if (customerId && productId) {
-                $.ajax({
-                    url: '/check-product-assignment',
-                    method: 'GET',
-                    data: {
-                        customer_id: customerId,
-                        product_id: productId
-                    },
-                    success: function(response) {
-                        if (response.assigned) {
-                            priceInput.val(response.assigned_price);
-                        } else {
-                            priceInput.val(response.product_price);
-                        }
-                        quantityInput.prop('disabled', false); // Enable quantity input
-                        updateSubTotal(productDiv);
-                        calculateInvoiceTotals();
-                    },
-                    error: function() {
-                        priceInput.val(0);
-                        quantityInput.prop('disabled', true); // Disable quantity input on error
+        function submitFormAsDraft() {
+            document.getElementById('invoiceForm').action = "{{ route('store.draft.invoice') }}";
+        }
+        $(document).ready(function() {
+            // Function to collect selected product IDs
+            function getSelectedProductIds() {
+                let selectedProductIds = [];
+                $('.product-select').each(function() {
+                    let productId = $(this).val();
+                    if (productId) {
+                        selectedProductIds.push(productId);
                     }
                 });
-            } else {
-                priceInput.val(0);
-                quantityInput.prop('disabled', true); // Disable quantity input if no product is selected
+                return selectedProductIds;
             }
-        });
 
-        // Update subtotal when quantity is changed
-        $(document).on('input', '.quantity-input', function() {
-            var productDiv = $(this).closest('.product');
-            updateSubTotal(productDiv);
-            calculateInvoiceTotals();
-        });
-    }
+            // Handle customer change and fetch products
+            $('#customer').change(function() {
+                var customerId = $(this).val();
+                if (customerId) {
+                    // Get the selected product IDs
+                    var selectedProductIds = getSelectedProductIds();
+                    $.ajax({
+                        url: '{{ route('get.products') }}',
+                        method: 'GET',
+                        data: {
+                            customer_id: customerId,
+                            selected_products: selectedProductIds
+                        },
+                        success: function(response) {
+                            console.log(response.products);
+                            var productSelects = $('.product-select');
+                            productSelects.empty();
+                            productSelects.append(
+                                '<option value="">Select Product...</option>');
 
-    // Calculate subtotal for each product
-    function updateSubTotal(productDiv) {
-        var price = parseFloat(productDiv.find('.price-input').val()) || 0;
-        var quantity = parseFloat(productDiv.find('.quantity-input').val()) || 0;
-        var subTotal = price * quantity;
-        productDiv.find('.subtotal-input').val(subTotal.toFixed(2));
-    }
+                            $.each(response.products, function(key, product) {
+                                productSelects.append('<option value="' + product.Id +
+                                    '" data-price="' + product.price + '">' +
+                                    product.Name + '</option>');
+                            });
 
-    // Calculate the overall totals
-    function calculateInvoiceTotals() {
-        let subtotal = 0;
+                            updatePrice(); // Ensure price update logic is in place
+                        },
+                        error: function() {
+                            alert('Failed to retrieve products');
+                        }
+                    });
+                } else {
+                    $('.product-select').empty().append('<option value="">Select Product...</option>');
+                }
+            });
 
-        // Sum up all subtotals
-        $('.product').each(function() {
-            let subTotal = parseFloat($(this).find('.subtotal-input').val()) || 0;
-            subtotal += subTotal;
-        });
+            // Update price and enable quantity input
+            function updatePrice() {
+                $('#customer, .product-select').change(function() {
+                    var customerId = $('#customer').val();
+                    var productDiv = $(this).closest('.product');
+                    var productSelect = productDiv.find('.product-select');
+                    var productId = productSelect.val();
+                    var priceInput = productDiv.find('.price-input');
+                    var quantityInput = productDiv.find('.quantity-input');
 
-        $('#invoice_subtotal').val(subtotal.toFixed(2));
+                    if (customerId && productId) {
+                        $.ajax({
+                            url: '/check-product-assignment',
+                            method: 'GET',
+                            data: {
+                                customer_id: customerId,
+                                product_id: productId
+                            },
+                            success: function(response) {
+                                if (response.assigned) {
+                                    priceInput.val(response.assigned_price);
+                                } else {
+                                    priceInput.val(response.product_price);
+                                }
+                                quantityInput.prop('disabled', false); // Enable quantity input
+                                updateSubTotal(productDiv);
+                                calculateInvoiceTotals();
+                            },
+                            error: function() {
+                                priceInput.val(0);
+                                quantityInput.prop('disabled',
+                                    true); // Disable quantity input on error
+                            }
+                        });
+                    } else {
+                        priceInput.val(0);
+                        quantityInput.prop('disabled',
+                            true); // Disable quantity input if no product is selected
+                    }
+                });
 
-        // Calculate tax (13%)
-        let tax = subtotal * 0.13;
-        $('#invoice_tax').val(tax.toFixed(2));
+                // Update subtotal when quantity is changed
+                $(document).on('input', '.quantity-input', function() {
+                    var productDiv = $(this).closest('.product');
+                    updateSubTotal(productDiv);
+                    calculateInvoiceTotals();
+                });
+            }
 
-        // Calculate grand total
-        let grandTotal = subtotal + tax;
-        $('#invoice_grand_total').val(grandTotal.toFixed(2));
-    }
+            // Calculate subtotal for each product
+            function updateSubTotal(productDiv) {
+                var price = parseFloat(productDiv.find('.price-input').val()) || 0;
+                var quantity = parseFloat(productDiv.find('.quantity-input').val()) || 0;
+                var subTotal = price * quantity;
+                productDiv.find('.subtotal-input').val(subTotal.toFixed(2));
+            }
 
-    // Initial setup on page load
-    $(document).ready(function() {
-        $('#customer').change(function() {
-            $('.product-select').trigger('change');
-        });
+            // Calculate the overall totals
+            function calculateInvoiceTotals() {
+                let subtotal = 0;
 
-        updatePrice(); // Ensure initial updatePrice logic is set up
-    });
+                // Sum up all subtotals
+                $('.product').each(function() {
+                    let subTotal = parseFloat($(this).find('.subtotal-input').val()) || 0;
+                    subtotal += subTotal;
+                });
 
-    // Add new product row dynamically
-    window.addProduct = function() {
-        var index = $('.product').length;
+                $('#invoice_subtotal').val(subtotal.toFixed(2));
 
-        var newProductHtml = `
+                // Calculate tax (13%)
+                let tax = subtotal * 0.13;
+                $('#invoice_tax').val(tax.toFixed(2));
+
+                // Calculate grand total
+                let grandTotal = subtotal + tax;
+                $('#invoice_grand_total').val(grandTotal.toFixed(2));
+            }
+
+            // Initial setup on page load
+            $(document).ready(function() {
+                $('#customer').change(function() {
+                    $('.product-select').trigger('change');
+                });
+
+                updatePrice(); // Ensure initial updatePrice logic is set up
+            });
+
+            // Add new product row dynamically
+            window.addProduct = function() {
+                var index = $('.product').length;
+
+                var newProductHtml = `
     <div class="row product">
         <div class="col-lg-4 col-md-6">
             <div class="fv-row mb-7">
@@ -645,45 +660,56 @@
         </div>
     </div>`;
 
-    $('#products').append(newProductHtml);
+                $('#products').append(newProductHtml);
 
-        var customerId = $('#customer').val();
-        if (customerId) {
-            // Get the selected product IDs
-            var selectedProductIds = getSelectedProductIds();
+                var customerId = $('#customer').val();
+                if (customerId) {
+                    // Get the selected product IDs
+                    var selectedProductIds = getSelectedProductIds();
 
-            $.ajax({
-                url: '{{ route('get.products') }}',
-                method: 'GET',
-                data: {
-                    customer_id: customerId,
-                    selected_products: selectedProductIds // Send selected product IDs
-                },
-                success: function(response) {
-                    var productSelect = $('#products .product-select:last');
-                    productSelect.empty();
-                    productSelect.append('<option value="">Select Product...</option>');
+                    $.ajax({
+                        url: '{{ route('get.products') }}',
+                        method: 'GET',
+                        data: {
+                            customer_id: customerId,
+                            selected_products: selectedProductIds // Send selected product IDs
+                        },
+                        success: function(response) {
+                            var productSelect = $('#products .product-select:last');
+                            productSelect.empty();
+                            productSelect.append('<option value="">Select Product...</option>');
 
-                    $.each(response.products, function(key, product) {
-                        productSelect.append('<option value="' + product.Id +
-                            '" data-price="' + product.UnitPrice + '">' + product
-                            .Name + '</option>');
+                            $.each(response.products, function(key, product) {
+                                productSelect.append('<option value="' + product.Id +
+                                    '" data-price="' + product.UnitPrice + '">' +
+                                    product
+                                    .Name + '</option>');
+                            });
+
+                            updatePrice(); // Ensure price is updated for new products
+                        },
+                        error: function() {
+                            alert('Failed to retrieve products');
+                        }
                     });
-
-                    updatePrice(); // Ensure price is updated for new products
-                },
-                error: function() {
-                    alert('Failed to retrieve products');
                 }
-            });
-        }
 
-        updatePrice(); // Ensure new product row behaves correctly
-    };
-    window.removeProduct = function(button) {
-    $(button).closest('.product').remove();
-}
-});
+                updatePrice(); // Ensure new product row behaves correctly
+                $('.product-search:last').on('keyup', function() {
+                    var searchTerm = $(this).val().toLowerCase();
+                    var productSelect = $(this).closest('.product').find('.product-select');
+
+                    // Filter options based on the search term
+                    productSelect.find('option').each(function() {
+                        var optionText = $(this).text().toLowerCase();
+                        $(this).toggle(optionText.indexOf(searchTerm) > -1);
+                    });
+                });
+            };
+            window.removeProduct = function(button) {
+                $(button).closest('.product').remove();
+            }
+        });
 
         // $(document).ready(function() {
         //     $('#customer').change(function() {

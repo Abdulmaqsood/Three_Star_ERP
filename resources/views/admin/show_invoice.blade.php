@@ -168,6 +168,9 @@
                         @endphp
                         <p class="m-0">Due Date: <strong> {{ $invoice->DueDate }}</strong></p>
                         <p class="m-0">Invoice # :<strong> {{ $invoice->DocNumber }}</strong></p>
+                        @if ($invoice->PONumber)
+                        <p class="m-0">PO # :<strong> {{ $invoice->PONumber }}</strong></p>
+                        @endif
                         {{-- <p class="m-0">Terms  :<strong> {{ $invoice->customer->terms }}</strong></p> --}}
                     </td>
                 </tr>

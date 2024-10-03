@@ -280,7 +280,7 @@
                                                     <td class="text-end pe-0">{{ $product->PurchaseCost }}</td>
                                                     <td class="text-end pe-0">
                                                         {{ $myProduct->profit ?? '' }}</td>
-                                                                                                            <td class="text-end pe-0">{{ $myProduct->pack }}</td>
+                                                                                                            <td class="text-end pe-0">{{ $myProduct->pack ?? '' }}</td>
 
 
 

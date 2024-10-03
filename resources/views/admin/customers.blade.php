@@ -145,36 +145,36 @@
                     <!--end::Alert-->
                 @endif
                 @if (session('error'))
-                <!--begin::Alert-->
-                <div class="alert alert-dismissible bg-light-danger d-flex flex-column flex-sm-row p-5 mb-10">
-                    <!--begin::Icon-->
-                    <i class="ki-duotone ki-notification-bing fs-2hx text-primary me-4 mb-5 mb-sm-0"><span
-                            class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                    <!--end::Icon-->
+                    <!--begin::Alert-->
+                    <div class="alert alert-dismissible bg-light-danger d-flex flex-column flex-sm-row p-5 mb-10">
+                        <!--begin::Icon-->
+                        <i class="ki-duotone ki-notification-bing fs-2hx text-primary me-4 mb-5 mb-sm-0"><span
+                                class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                        <!--end::Icon-->
 
-                    <!--begin::Wrapper-->
-                    <div class="d-flex flex-column pe-0 pe-sm-10">
-                        <!--begin::Title-->
-                        <h4 class="fw-semibold">Error</h4>
-                        <!--end::Title-->
+                        <!--begin::Wrapper-->
+                        <div class="d-flex flex-column pe-0 pe-sm-10">
+                            <!--begin::Title-->
+                            <h4 class="fw-semibold">Error</h4>
+                            <!--end::Title-->
 
-                        <!--begin::Content-->
-                        <span>{{ session('error') }}</span>
-                        <!--end::Content-->
+                            <!--begin::Content-->
+                            <span>{{ session('error') }}</span>
+                            <!--end::Content-->
+                        </div>
+                        <!--end::Wrapper-->
+
+                        <!--begin::Close-->
+                        <button type="button"
+                            class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
+                            data-bs-dismiss="alert">
+                            <i class="ki-duotone ki-cross fs-1 text-primary"><span class="path1"></span><span
+                                    class="path2"></span></i>
+                        </button>
+                        <!--end::Close-->
                     </div>
-                    <!--end::Wrapper-->
-
-                    <!--begin::Close-->
-                    <button type="button"
-                        class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
-                        data-bs-dismiss="alert">
-                        <i class="ki-duotone ki-cross fs-1 text-primary"><span class="path1"></span><span
-                                class="path2"></span></i>
-                    </button>
-                    <!--end::Close-->
-                </div>
-                <!--end::Alert-->
-            @endif
+                    <!--end::Alert-->
+                @endif
 
                 <!--begin::Card-->
                 <div class="card">
@@ -249,8 +249,8 @@
                                     <th class="min-w-125px">Phone #</th>
                                     {{-- <th class="min-w-125px">Payment Method</th> --}}
                                     <th class="min-w-125px">Company</th>
-                                    <th class="min-w-125px">Title</th>
                                     <th class="min-w-125px">Status</th>
+                                    <th class="min-w-125px">Invoice</th>
                                     <th class="min-w-125px">Favourite</th>
                                     <th class="text-end min-w-100px">Actions</th>
                                 </tr>
@@ -280,13 +280,19 @@
                                             <td>{{ $user->PrimaryPhone->FreeFormNumber ?? '' }}</td>
                                             {{-- <td>{{ $user->payment_method->method ?? '' }}</td> --}}
                                             <td>{{ $user->CompanyName ?? '' }}</td>
-                                            <td>{{ $user->Title ?? '' }}</td>
                                             <td>
                                                 @if ($user->Active == true)
                                                     <span class="badge bg-secondary">Active</span>
                                                 @else
                                                     <span class="badge bg-secondary">InActive</span>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('add.invoice', ['customer' => $user->Id]) }}"
+                                                    class="btn btn-primary">
+                                                    Create Invoice
+                                                </a>
+
                                             </td>
                                             <td>
                                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
@@ -337,9 +343,6 @@
                         <!-- Modals for each user -->
                         @if (!empty($users) && count($users) > 0)
                             @foreach ($users as $user)
-                                {{-- @php
-                                    $assignedProductIds = $user->products->pluck('id')->toArray();
-                                @endphp --}}
                                 <div class="modal bg-body fade" tabindex="-1"
                                     id="kt_modal_scrollable_{{ $user->Id }}">
                                     <div class="modal-dialog modal-fullscreen">
@@ -369,11 +372,18 @@
                                                         @endif
                                                     @endif
                                                     <!-- Search bar -->
-                                                    <div class="mb-3">
+                                                    <div class="mb-3 position-relative">
                                                         <input type="text" data-user-id="{{ $user->Id }}"
                                                             class="search-input form-control"
-                                                            placeholder="Search products...">
+                                                            placeholder="Search products..."
+                                                            id="search-input-{{ $user->Id }}"
+                                                            style="padding-right: 30px;">
+                                                        <!-- Add padding to make space for the clear button -->
+                                                        <span class="clear-input fs-2"
+                                                            style="cursor: pointer; position:absolute; right:10px; top:5px; display: none;">&times;</span>
                                                     </div>
+
+
                                                     <!-- Product table -->
                                                     <div class="table-responsive">
                                                         <table class="table table-bordered table-hover">
@@ -394,16 +404,11 @@
                                                                 @if (!empty($products) && count($products) > 0)
                                                                     @forelse ($products as $product)
                                                                         @php
-                                                                            $myProduct = App\Models\Product::where(
-                                                                                'quickbook_id',
-                                                                                $product->Id,
+                                                                            $assignedProduct = App\Models\CustomerProduct::where(
+                                                                                'customer_id',
+                                                                                $user->Id,
                                                                             )
-                                                                                ->with(
-                                                                                    'category',
-                                                                                    'subCategory',
-                                                                                    'vendor',
-                                                                                    'manufacturer',
-                                                                                )
+                                                                                ->where('product_id', $product->Id)
                                                                                 ->first();
                                                                         @endphp
                                                                         {{-- @php
@@ -433,7 +438,7 @@
                                                                                         type="checkbox" name="products[]"
                                                                                         value="{{ $product->Id }}"
                                                                                         id="product{{ $product->Id }}_{{ $user->Id }}"
-                                                                                        {{-- {{ $isChecked }} --}}>
+                                                                                        @if ($assignedProduct) checked @endif>
                                                                                 </div>
                                                                             </td>
                                                                             <td>
@@ -488,18 +493,14 @@
                                                                                     id="assignedPrice{{ $product->Id }}_{{ $user->Id }}"
                                                                                     class="form-control form-control-sm larger-text assign-price-input"
                                                                                     placeholder="Assign price"
-                                                                                    {{-- @if ($isDisabled)
-                                                                                disabled
-                                                                            @endif  @if ($isChecked)
-                                                                                value="{{$assignedPrice}}"
-                                                                            @endif  --}}>
+                                                                                    @if ($assignedProduct) value="{{ $assignedProduct->assign_price ?? '' }}" @else disabled  @endif >
                                                                             </td>
                                                                             <td>
                                                                                 <input type="text"
                                                                                     name="profit[{{ $product->Id }}]"
                                                                                     id="profit{{ $product->Id }}_{{ $user->Id }}"
                                                                                     class="form-control form-control-sm larger-text"
-                                                                                    placeholder="Profit" readonly>
+                                                                                    placeholder="Profit"  @if ($assignedProduct) value="{{ $assignedProduct->profit ?? '' }}"   @endif readonly>
                                                                             </td>
 
                                                                         </tr>
@@ -1164,16 +1165,16 @@
             // Function to handle enabling/disabling inputs based on checkbox status
             function toggleInputs(productId, userId, isChecked) {
                 const assignedPriceInput = $('#assignedPrice' + productId + '_' + userId);
-                const packInput = $('#quantity' + productId + '_' + userId);
+                // const packInput = $('#quantity' + productId + '_' + userId);
                 const actionButton = $('#button_' + userId);
 
                 if (isChecked) {
                     assignedPriceInput.prop('disabled', false);
                     actionButton.prop('disabled', false);
-                    packInput.prop('disabled', false);
+                    // packInput.prop('disabled', false);
                 } else {
                     assignedPriceInput.prop('disabled', true).val('');
-                    packInput.prop('disabled', true);
+                    // packInput.prop('disabled', true);
                 }
 
                 // Check if any checkbox is checked, then enable/disable action button
@@ -1196,7 +1197,7 @@
 
                     // Disable the corresponding inputs for unchecked products
                     $('#assignedPrice' + productId + '_' + userId).prop('disabled', true);
-                    $('#quantity' + productId + '_' + userId).prop('disabled', true);
+                    // $('#quantity' + productId + '_' + userId).prop('disabled', true);
                     $('#profit' + productId + '_' + userId).prop('disabled', true);
                 });
             });
@@ -1257,17 +1258,17 @@
                     .pop(); // Extract user ID from modal ID
 
                 var assignedPriceInput = $('#assignedPrice' + productId + '_' + userId);
-                var packInput = $('#quantity' + productId + '_' + userId);
+                // var packInput = $('#quantity' + productId + '_' + userId);
                 var actionButton = $('#button_' + userId);
 
                 if ($(this).is(':checked')) {
                     assignedPriceInput.prop('disabled', false);
                     actionButton.prop('disabled', false);
-                    packInput.prop('disabled', false);
+                    // packInput.prop('disabled', false);
                 } else {
                     assignedPriceInput.prop('disabled', true).val('');
                     actionButton.prop('disabled', true);
-                    packInput.prop('disabled', true);
+                    // packInput.prop('disabled', true);
 
                 }
             });
@@ -1302,6 +1303,50 @@
             window.location.href = this.href;
         });
     </script>
+    <script>
+$(document).ready(function() {
+    // Function to clear the input, hide the clear button, and show all products
+    function clearInput(userId) {
+        const input = $('#search-input-' + userId);  // Use jQuery for consistency
+        input.val(''); // Clear the text
+        input.parent().find('.clear-input').hide(); // Hide the clear button
+        input.focus(); // Focus back on the input field
+
+        // Show all products since the search term is cleared
+        $(`#kt_modal_scrollable_${userId} tbody tr`).show(); // Show all products
+    }
+
+    // Event listener for the search input
+    $('.search-input').on('input', function() {
+        var searchTerm = $(this).val().toLowerCase();
+        var userId = $(this).data('user-id');
+        
+        // Filter the products based on the search term
+        $(`#kt_modal_scrollable_${userId} tbody tr`).each(function() {
+            var productName = $(this).data('product-name').toLowerCase();
+            if (productName.includes(searchTerm)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+
+        // Show/hide the clear button based on input length
+        const clearBtn = $(this).parent().find('.clear-input');
+        if (searchTerm.length > 0) {
+            clearBtn.show(); // Show the 'X' button if there is text
+        } else {
+            clearBtn.hide(); // Hide if the input is empty
+        }
+    });
+
+    // Handle the click event on the 'X' button
+    $('.clear-input').on('click', function() {
+        const userId = $(this).siblings('.search-input').data('user-id'); // Get the user ID from the input
+        clearInput(userId); // Clear the input and show all products
+    });
+});
+</script>
 
 
     <script src="{{ asset('assets/js/custom/apps/ecommerce/customers/listing/listing.js') }}"></script>

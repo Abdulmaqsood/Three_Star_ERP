@@ -672,12 +672,12 @@
                                             <!--begin::Input group-->
                                             <div class="fv-row mb-7">
                                                 <!--begin::Label-->
-                                                <label class=" form-label">State</label>
+                                                <label class=" form-label">Province</label>
                                                 <!--end::Label-->
 
                                                 <!--begin::Input-->
                                                 <input type="text" name="state" class="form-control mb-2"
-                                                    placeholder="State..." value="{{ old('state') }}">
+                                                    placeholder="Province..." value="{{ old('state', $user->BillAddr->CountrySubDivisionCode ?? "") }}">
                                                 <!--end::Input-->
 
 
@@ -698,12 +698,12 @@
                                             <!--begin::Input group-->
                                             <div class="fv-row mb-7">
                                                 <!--begin::Label-->
-                                                <label class=" form-label">Zip Code</label>
+                                                <label class=" form-label">Postal Code</label>
                                                 <!--end::Label-->
 
                                                 <!--begin::Input-->
                                                 <input type="text" name="zipCode" class="form-control mb-2"
-                                                    placeholder="Zip Code..." value="{{ old('zipCode', $user->BillAddr->PostalCode ?? "") }}">
+                                                    placeholder="Postal Code..." value="{{ old('zipCode', $user->BillAddr->PostalCode ?? "") }}">
                                                 <!--end::Input-->
 
                                                 @error('zipCode')
@@ -743,7 +743,7 @@
                                         <!--end::Col-->
                                     </div>
 
-                                        {{-- <!--begin::Input group-->
+                                        <!--begin::Input group-->
                                         <div class="d-flex align-items-center justify-content-start mb-7">
                                             <!--begin::Input-->
                                             <input type="checkbox" name="shippingSame" id="shippingSame" class="me-2">
@@ -754,7 +754,7 @@
                                                 Address</label>
                                             <!--end::Label-->
                                         </div>
-                                        <!--end::Input group--> --}}
+                                        <!--end::Input group-->
 
 
                                 </div>
@@ -853,12 +853,12 @@
                                             <!--begin::Input group-->
                                             <div class="fv-row mb-7">
                                                 <!--begin::Label-->
-                                                <label class=" form-label">State</label>
+                                                <label class=" form-label">Province</label>
                                                 <!--end::Label-->
 
                                                 <!--begin::Input-->
                                                 <input type="text" name="shippingState" class="form-control mb-2"
-                                                    placeholder="State..." value="{{ old('shippingState') }}">
+                                                    placeholder="Province..." value="{{ old('shippingState',$user->ShipAddr->CountrySubDivisionCode ?? "") }}">
                                                 <!--end::Input-->
 
 
@@ -879,12 +879,12 @@
                                             <!--begin::Input group-->
                                             <div class="fv-row mb-7">
                                                 <!--begin::Label-->
-                                                <label class=" form-label">Zip Code</label>
+                                                <label class=" form-label">Postal Code</label>
                                                 <!--end::Label-->
 
                                                 <!--begin::Input-->
                                                 <input type="text" name="shippingZipCode" class="form-control mb-2"
-                                                    placeholder="Zip Code..." value="{{ old('shippingZipCode', $user->ShipAddr->PostalCode ?? "") }}">
+                                                    placeholder="Postal Code..." value="{{ old('shippingZipCode', $user->ShipAddr->PostalCode ?? "") }}">
                                                 <!--end::Input-->
 
                                                 @error('shippingZipCode')
@@ -953,3 +953,25 @@
         <!--end::Post-->
     </div>
 @endsection
+@push('custom-scripts')
+    <script>
+        $(document).ready(function() {
+            // Function to toggle the visibility of the Shipping Address section
+            function toggleShippingAddress() {
+                if ($('#shippingSame').is(':checked')) {
+                    $('#shippingAddressDiv').hide(); // Hide the shipping address section
+                } else {
+                    $('#shippingAddressDiv').show(); // Show the shipping address section
+                }
+            }
+
+            // Initially hide or show the shipping address section based on the checkbox state
+            toggleShippingAddress();
+
+            // Add event listener to the checkbox
+            $('#shippingSame').change(function() {
+                toggleShippingAddress();
+            });
+        });
+    </script>
+@endpush

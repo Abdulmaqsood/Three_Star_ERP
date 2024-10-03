@@ -604,7 +604,6 @@ class ProductController extends Controller
 
         $customerId = $request->input('customer_id');
         $selectedProductIds = $request->input('selected_products', []);
-
         // Fetch related products from the customerProduct table
         $productIds = DB::table('customer_products')
             ->where('customer_id', $customerId)
