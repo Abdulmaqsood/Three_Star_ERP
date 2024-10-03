@@ -113,7 +113,7 @@
 
                             <!--begin::Card body-->
                             <div class="card-body pt-0">
-                               
+
                                 <div class="row">
                                     <!--begin::Input group-->
                                     <div class="col-lg-6 col-md-6 mb-10 fv-row fv-plugins-icon-container">
@@ -143,7 +143,7 @@
 
                                         <!--begin::Input-->
                                         <input type="text" name="po_number" class="form-control mb-2"
-                                            placeholder="Invoice PO #" value="{{ old('po_number' , $invoice->PONumber) }}">
+                                            placeholder="Invoice PO #" value="{{ old('po_number', $invoice->PONumber) }}">
                                         <!--end::Input-->
 
                                         @error('po_number')
@@ -292,6 +292,7 @@
                                                 $itemRef = $product->SalesItemLineDetail->ItemRef ?? '';
                                                 $qty = $product->SalesItemLineDetail->Qty ?? '';
                                                 $UnitPrice = $product->SalesItemLineDetail->UnitPrice ?? '';
+                                                $Pack = $product->SalesItemLineDetail->Description ?? '';
                                             }
                                         @endphp
                                         <div class="row product">
@@ -349,7 +350,11 @@
                                                         value="{{ old('products.' . $index . '.price', $UnitPrice) }}"
                                                         readonly>
                                                     <!--end::Input-->
-
+                                                    <!--begin::Input-->
+                                                    <input type="text" name="products[0][pack]"
+                                                        class="form-control mb-2 pack-input" placeholder="Pack..."
+                                                        value="{{ old('products.'.$index.'.pack', $Pack) }}" hidden>
+                                                    <!--end::Input-->
                                                     @error('products.' . $index . '.price')
                                                         <span class="text-danger">{{ $message }}</span>
                                                     @enderror
@@ -532,6 +537,7 @@
                     var productSelect = $(this).closest('.product').find('.product-select');
                     var productId = productSelect.val();
                     var priceInput = $(this).closest('.product').find('.price-input');
+                    var packInput = $(this).closest('.product').find('.pack-input');
 
                     if (customerId && productId) {
                         $.ajax({
@@ -544,8 +550,12 @@
                             success: function(response) {
                                 if (response.assigned) {
                                     priceInput.val(response.assigned_price);
+                                    packInput.val(response.pack);
+
                                 } else {
                                     priceInput.val(response.product_price);
+                                    packInput.val(response.pack);
+
                                 }
                                 updateSubTotal(productSelect);
                             },
@@ -555,6 +565,8 @@
                         });
                     } else {
                         priceInput.val(0);
+                        packInput.val(0);
+
                     }
                 });
 

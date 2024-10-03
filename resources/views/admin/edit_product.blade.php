@@ -401,7 +401,7 @@
                                                 <!--begin::Input-->
                                                 <input type="text" id="profit" name="profit"
                                                     class="form-control mb-2" placeholder="Product profit"
-                                                    value="{{ $myProduct->profit }}" readonly>
+                                                    value="{{ old('profit',$myProduct->profit ?? '')  }}" readonly>
                                                 <!--end::Input-->
 
                                                 @error('profit')

@@ -98,9 +98,6 @@
                     class="form d-flex flex-column flex-lg-row fv-plugins-bootstrap5 fv-plugins-framework"
                     enctype="multipart/form-data" id="invoiceForm">
                     @csrf
-
-                    <input type="hidden" name="invoice_id" value="">
-
                     <!--begin::Main column-->
                     <div class="d-flex flex-column flex-row-fluid gap-7 w-lg-100 gap-lg-12">
                         <!--begin::General options-->
@@ -331,6 +328,13 @@
                                                 <input type="text" name="products[0][price]"
                                                     class="form-control mb-2 price-input" placeholder="Rate..."
                                                     value="{{ old('products.0.price', 0) }}" readonly>
+
+
+                                                <!--end::Input-->
+                                                <!--begin::Input-->
+                                                <input type="text" name="products[0][pack]"
+                                                    class="form-control mb-2 pack-input" placeholder="Pack..."
+                                                    value="{{ old('products.0.pack', 0) }}" hidden>
                                                 <!--end::Input-->
 
                                                 @error('products.0.price')
@@ -343,6 +347,7 @@
                                             <!--end::Input group-->
                                         </div>
                                         <!--end::Col-->
+
 
                                         <!--begin::Col-->
                                         <div class="col-lg-2 col-md-6">
@@ -542,6 +547,7 @@
                     var productSelect = productDiv.find('.product-select');
                     var productId = productSelect.val();
                     var priceInput = productDiv.find('.price-input');
+                    var packInput = productDiv.find('.pack-input');
                     var quantityInput = productDiv.find('.quantity-input');
 
                     if (customerId && productId) {
@@ -553,10 +559,13 @@
                                 product_id: productId
                             },
                             success: function(response) {
+                                console.log(response);
                                 if (response.assigned) {
                                     priceInput.val(response.assigned_price);
+                                    packInput.val(response.pack);
                                 } else {
                                     priceInput.val(response.product_price);
+                                    packInput.val(response.pack);
                                 }
                                 quantityInput.prop('disabled', false); // Enable quantity input
                                 updateSubTotal(productDiv);
@@ -564,12 +573,14 @@
                             },
                             error: function() {
                                 priceInput.val(0);
+                                packInput.val(0);
                                 quantityInput.prop('disabled',
                                     true); // Disable quantity input on error
                             }
                         });
                     } else {
                         priceInput.val(0);
+                        packInput.val(0);
                         quantityInput.prop('disabled',
                             true); // Disable quantity input if no product is selected
                     }

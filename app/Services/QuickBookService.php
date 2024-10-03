@@ -1003,13 +1003,20 @@ class QuickBookService
         $fetchedProducts = [];
 
         foreach ($productIds as $id) {
-            // Query QuickBooks for the specific product by ID
             $query = "SELECT * FROM Item WHERE Id = '$id' AND Type = 'NONINVENTORY'";
             $product = $this->dataService->Query($query);
-            if ($product) {
+            
+            if (empty($product)) {
+                $query = "SELECT * FROM Item WHERE Id = '$id'";
+                $product = $this->dataService->Query($query);
+            }
+        
+            // If a product is found in either case, add to the fetchedProducts array
+            if (!empty($product)) {
                 $fetchedProducts[] = $product[0];
             }
         }
+        
 
 
         // // Loop through QuickBooks products and check if they match the provided IDs
@@ -1028,6 +1035,7 @@ class QuickBookService
     /// Invoices Manages
     public function processInvoiceData($data)
     {
+        // @dd($data);
         try {
             $taxCodes = $this->dataService->Query("SELECT * FROM TaxCode");
 
@@ -1061,7 +1069,6 @@ class QuickBookService
                 ],
                 "DocNumber" => $data['invoice_number'],
                 "PONumber" => $data['po_number'] ?? null,
-                "TxnDate" => now()->addDays(30), 
                 "DueDate" => now()->addDays(30), 
                 "PrivateNote" => $data['invoice_description'] ?? '',
                 "TotalAmt" => $data['invoice_grand_total'],
@@ -1090,7 +1097,7 @@ class QuickBookService
                     // ]
                 ]
             ];
-
+            
             // Add each product as a line item in the QuickBooks invoice
             foreach ($data['products'] as $item) {
                 $products = $this->dataService->Query("SELECT * FROM Item WHERE Id LIKE '%{$item['id']}%'");
@@ -1106,13 +1113,13 @@ class QuickBookService
                         "Qty" => $item['quantity'],
                         "UnitPrice" => $item['price'],
                         "ItemRef" => [
-                            "value" => $product->Id // Ensure this matches the QuickBooks item ID
+                            "value" => $product->Id 
                         ],
                         "TaxCodeRef" => [
-                            "value" => $taxRef // Replace with the actual tax code
+                            "value" => $taxRef 
                         ]
                     ],
-                    "Description" => $item['description'] ?? 'default description'
+                    "Description" => $item['pack'] ?? 'default description'
                 ];
             }
 

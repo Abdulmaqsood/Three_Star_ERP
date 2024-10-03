@@ -588,12 +588,13 @@ class ProductController extends Controller
         if ($assignment) {
             return response()->json([
                 'assigned' => true,
-                'assigned_price' => $assignment->assign_price, // Assuming the assignment has a price field
+                'assigned_price' => $assignment->assign_price, 
+                'pack' => $assignment->quantity, 
             ]);
         } else {
             return response()->json([
                 'assigned' => false,
-                'product_price' => $productPrice
+                'product_price' => $productPrice,
             ]);
         }
     }
