@@ -14,7 +14,6 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="ThreeStar" />
-    <meta property="og:url" content="https://test.technos.co" />
     <meta property="og:site_name" content="Three Star" />
     <link rel="shortcut icon" href="{{ asset('assets/media/logo.webp') }}" />
     @stack('custom-css')

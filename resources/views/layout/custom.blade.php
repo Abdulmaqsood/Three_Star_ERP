@@ -8,9 +8,9 @@
     <title>Three Star</title>
     <meta charset="utf-8" />
     <meta name="description"
-        content="Craft admin dashboard live demo. Check out all the features of the admin panel. A large number of settings, additional services and widgets." />
+        content="" />
     <meta name="keywords"
-        content="Craft, bootstrap, bootstrap 5, admin themes, dark mode, free admin themes, bootstrap admin, bootstrap dashboard" />
+        content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="shortcut icon" href="{{ asset('assets/media/logo.webp') }}" />
