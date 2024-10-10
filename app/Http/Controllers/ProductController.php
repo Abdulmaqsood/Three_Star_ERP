@@ -290,7 +290,6 @@ class ProductController extends Controller
     {
         $data['products'] = CustomerProduct::where('customer_id', $customer)->get();
         $data['customerId'] = $customer;
-
         return view('admin.allAssignedProducts', $data);
     }
     public function allFavourites()

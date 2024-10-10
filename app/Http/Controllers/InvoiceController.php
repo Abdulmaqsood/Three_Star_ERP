@@ -43,9 +43,20 @@ class InvoiceController extends Controller
         // $data['customers'] = Customer::with('address')->get();
         // $data['products'] = Product::all();
         $data['customers'] = $this->quickBooksService->allCustomers();
-        $data['products'] = $this->quickBooksService->allProducts();
         $data['customer'] = $this->quickBooksService->editCustomer($customer);
-        $data['customerProducts'] = CustomerProduct::all();
+        $customerId = $customer;
+        $selectedProductIds = [];
+        // Fetch related products from the customerProduct table
+        $productIds = DB::table('customer_products')
+            ->where('customer_id', $customerId)
+            ->whereNotIn('product_id', $selectedProductIds)
+            ->pluck('product_id')
+            ->toArray();
+        if (empty($productIds)) {
+            $data['products'] = $this->quickBooksService->allProducts();
+        }
+        $products = $this->quickBooksService->fetchInvoiceProducts($productIds);
+        $data['customerProducts'] = $products;
         return view('admin.add_invoice', $data);
     }
     public function edit($invoice)

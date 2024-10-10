@@ -302,6 +302,11 @@
                                                     class="form-select form-select-solid fw-bold product-select">
                                                     <option value="">Select Product...</option>
                                                     <!-- Products will be loaded here by JavaScript -->
+                                                    @if(isset($customerProducts) && count($customerProducts) > 0)
+                                                    @foreach($customerProducts as $product)
+                                                        <option value="{{ $product->Id }}">{{ $product->Name }}</option>
+                                                    @endforeach
+                                                @endif
                                                 </select>
                                                 <!--end::Input-->
                                                 @error('products.0.id')
@@ -683,7 +688,7 @@
                         method: 'GET',
                         data: {
                             customer_id: customerId,
-                            selected_products: selectedProductIds // Send selected product IDs
+                            selected_products: selectedProductIds
                         },
                         success: function(response) {
                             var productSelect = $('#products .product-select:last');

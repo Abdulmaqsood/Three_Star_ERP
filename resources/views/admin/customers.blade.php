@@ -243,13 +243,13 @@
                                         </div>
                                     </th>
                                     <th class="min-w-125px">Display Name</th>
-                                    <th class="min-w-125px">Firstname</th>
+                                    {{-- <th class="min-w-125px">Firstname</th> --}}
                                     <th class="min-w-125px">Email</th>
-                                    <th class="min-w-125px">Lastname</th>
+                                    {{-- <th class="min-w-125px">Lastname</th> --}}
                                     <th class="min-w-125px">Phone #</th>
                                     {{-- <th class="min-w-125px">Payment Method</th> --}}
-                                    <th class="min-w-125px">Company</th>
-                                    <th class="min-w-125px">Status</th>
+                                    {{-- <th class="min-w-125px">Company</th> --}}
+                                    {{-- <th class="min-w-125px">Status</th> --}}
                                     <th class="min-w-125px">Invoice</th>
                                     <th class="min-w-125px">Favourite</th>
                                     <th class="text-end min-w-100px">Actions</th>
@@ -274,19 +274,19 @@
                                                 </div>
                                                 <!--end::User details-->
                                             </td>
-                                            <td>{{ $user->GivenName ?? '' }}</td>
+                                            {{-- <td>{{ $user->GivenName ?? '' }}</td> --}}
                                             <td>{{ $user->PrimaryEmailAddr->Address ?? '' }}</td>
-                                            <td>{{ $user->FamilyName }}</td>
+                                            {{-- <td>{{ $user->FamilyName }}</td> --}}
                                             <td>{{ $user->PrimaryPhone->FreeFormNumber ?? '' }}</td>
                                             {{-- <td>{{ $user->payment_method->method ?? '' }}</td> --}}
-                                            <td>{{ $user->CompanyName ?? '' }}</td>
+                                            {{-- <td>{{ $user->CompanyName ?? '' }}</td>
                                             <td>
                                                 @if ($user->Active == true)
                                                     <span class="badge bg-secondary">Active</span>
                                                 @else
                                                     <span class="badge bg-secondary">InActive</span>
                                                 @endif
-                                            </td>
+                                            </td> --}}
                                             <td>
                                                 <a href="{{ route('add.invoice', ['customer' => $user->Id]) }}"
                                                     class="btn btn-primary">
