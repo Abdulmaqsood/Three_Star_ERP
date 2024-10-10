@@ -1035,10 +1035,8 @@ class QuickBookService
     /// Invoices Manages
     public function processInvoiceData($data)
     {
-        // @dd($data);
         try {
             $taxCodes = $this->dataService->Query("SELECT * FROM TaxCode");
-
             foreach ($taxCodes as $taxCode) {
                 if ($taxCode->Name === 'HST ON') {
                     $taxRef = $taxCode->Id;
@@ -1047,6 +1045,7 @@ class QuickBookService
 
             // Fetch the customer from QuickBooks
             $customer = $this->dataService->FindById('Customer', $data['customer_id']);
+
             if (!$customer) {
                 return ['error' => "Customer with ID {$data['customer_id']} not found in QuickBooks."];
             }
@@ -1057,6 +1056,12 @@ class QuickBookService
                 "PrintStatus" => "NeedToPrint",
                 "SalesTermRef" => [
                     "value" => "3" // Set to your actual SalesTermRef value
+                ],
+                 "CustomField" => [
+                     "DefinitionId" => "1",
+                     "Name" => "PO #",
+                     "Type" => "StringType",
+                    "StringValue" => $data['po_number'] ?? null,
                 ],
                 "CustomerRef" => [
                     "value" => $customer->Id // Ensure this matches the QuickBooks customer ID
@@ -1097,10 +1102,11 @@ class QuickBookService
                     // ]
                 ]
             ];
-            
+
             // Add each product as a line item in the QuickBooks invoice
             foreach ($data['products'] as $item) {
-                $products = $this->dataService->Query("SELECT * FROM Item WHERE Id LIKE '%{$item['id']}%'");
+                $products = $this->dataService->Query("SELECT * FROM Item WHERE Id LIKE '%{$item['id']}%' AND Type = 'NONINVENTORY'");
+
                 if (empty($products) || !isset($products[0]->Id)) {
                     // throw new \Exception("Product with SKU {$item['id']} not found in QuickBooks.");
                     return ['error' => "Product with SKU {$item['id']} not found in QuickBooks."];
@@ -1123,13 +1129,13 @@ class QuickBookService
                 ];
             }
 
-            $existingInvoice = $this->dataService->Query("SELECT * FROM Invoice WHERE Id = '{$data['invoice_id']}'");
-            if (empty($existingInvoice)) {
-                // Add the invoice to QuickBooks
-                $qboInvoiceObject = QBOInvoice::create($quickBooksInvoice);
 
+              if (empty($data['invoice_id'])) {
+                $qboInvoiceObject = QBOInvoice::create($quickBooksInvoice);
+                
                 $result = $this->dataService->Add($qboInvoiceObject);
             } else {
+                $existingInvoice = $this->dataService->Query("SELECT * FROM Invoice WHERE Id = '{$data['invoice_id']}'");
                 $existingInvoice = reset($existingInvoice);
                 $quickBooksInvoice['Id'] = $existingInvoice->Id;
                 $quickBooksInvoice['SyncToken'] = $existingInvoice->SyncToken;
@@ -1137,10 +1143,12 @@ class QuickBookService
                 $result = $this->dataService->Update($qboInvoiceObject);
             }
 
-            if ($result) {
+            if (!empty($result)) {
                 return $result;
             } else {
+
                 $error = $this->dataService->getLastError();
+                @dd($error);
                 return ['error' => "Failed to create/update invoice in QuickBooks  {$error->getResponseBody()}"];
             }
         } catch (\Exception $e) {

@@ -458,7 +458,7 @@
                                                                                 <input type="text"
                                                                                     id="manufacturerCode{{ $product->Id }}"
                                                                                     class="form-control form-control-sm larger-text"
-                                                                                    value="{{ $myProduct->manufacturer_code ?? null }}"
+                                                                                    value="{{ $assignedProduct->manufacturer_code ?? null }}"
                                                                                     readonly>
                                                                             </td>
                                                                             <td>
@@ -470,7 +470,7 @@
                                                                                     {{-- @if ($isDisabled)
                                                                                 disabled
                                                                             @endif --}}
-                                                                                    value="{{ $myProduct->pack ?? '' }}"
+                                                                                    value="{{ $assignedProduct->quantity  ?? '' }}"
                                                                                     readonly>
                                                                             </td>
                                                                             <td>

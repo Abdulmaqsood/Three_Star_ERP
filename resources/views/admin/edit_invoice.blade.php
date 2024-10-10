@@ -355,6 +355,7 @@
                                                         class="form-control mb-2 pack-input" placeholder="Pack..."
                                                         value="{{ old('products.'.$index.'.pack', $Pack) }}" hidden>
                                                     <!--end::Input-->
+
                                                     @error('products.' . $index . '.price')
                                                         <span class="text-danger">{{ $message }}</span>
                                                     @enderror
@@ -662,6 +663,8 @@
                 <div class="fv-row mb-7">
                     <label class="form-label">Price</label>
                     <input type="text" name="products[${index}][price]" class="form-control mb-2 price-input" placeholder="Price..." value="0" readonly>
+                                                       <input type="text" name="products[${index}][pack]" class="form-control mb-2 pack-input"  value="0" hidden>
+
                     @error('products.${index}.price')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror

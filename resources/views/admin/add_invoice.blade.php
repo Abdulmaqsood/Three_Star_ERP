@@ -564,7 +564,6 @@
                                 product_id: productId
                             },
                             success: function(response) {
-                                console.log(response);
                                 if (response.assigned) {
                                     priceInput.val(response.assigned_price);
                                     packInput.val(response.pack);
@@ -657,6 +656,8 @@
             <div class="fv-row mb-7">
                 <label class="form-label">Price</label>
                 <input type="text" name="products[${index}][price]" class="form-control mb-2 price-input" placeholder="Price..." value="0" readonly>
+                                   <input type="text" name="products[${index}][pack]" class="form-control mb-2 pack-input"  value="0" hidden>
+
             </div>
         </div>
         <div class="col-lg-2 col-md-6">

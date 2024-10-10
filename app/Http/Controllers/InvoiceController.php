@@ -68,6 +68,7 @@ class InvoiceController extends Controller
             $data['invoice'] = $invoice;
             $data['customers'] = $customers;
             $data['allProducts'] = $products;
+
             return view('admin.edit_invoice', $data);
         } else {
             return redirect()->back()
@@ -119,7 +120,6 @@ class InvoiceController extends Controller
                 'shipping_province' => 'nullable|string|max:255',
                 'shipping_country' => 'nullable|string|max:255',
             ]);
-
 
             $result = $this->quickBooksService->processInvoiceData($request->all());
             if ($result) {
